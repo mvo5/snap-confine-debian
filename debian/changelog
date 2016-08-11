@@ -1,6 +1,12 @@
 snap-confine (1.0.40-1) UNRELEASED; urgency=medium
 
+  [ Michael Hudson-Doyle ]
   * New upstream release (presumably).
+
+  [ Zygmunt Krynicki ]
+  * Drop apparmor profile from the debian/ directory and install it straight
+    from upstream package. This is now automatically consistent with package
+    configuration prefix.
 
  -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Tue, 16 Aug 2016 15:02:10 +1200
 
