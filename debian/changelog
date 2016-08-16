@@ -1,3 +1,9 @@
+snap-confine (1.0.40-1) UNRELEASED; urgency=medium
+
+  * New upstream release (presumably).
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Tue, 16 Aug 2016 15:02:10 +1200
+
 snap-confine (1.0.39-1) unstable; urgency=medium
 
   * New upstream release.
