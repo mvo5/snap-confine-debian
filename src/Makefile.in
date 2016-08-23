@@ -89,7 +89,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 libexec_PROGRAMS = snap-confine$(EXEEXT)
-noinst_PROGRAMS = snap-confine-unit-tests$(EXEEXT)
+@WITH_UNIT_TESTS_TRUE@noinst_PROGRAMS =  \
+@WITH_UNIT_TESTS_TRUE@	snap-confine-unit-tests$(EXEEXT)
 @SECCOMP_TRUE@am__append_1 = \
 @SECCOMP_TRUE@	seccomp-support.c \
 @SECCOMP_TRUE@	seccomp-support.h
@@ -114,6 +115,7 @@ am__snap_confine_SOURCES_DIST = main.c sc-main.c sc-main.h utils.c \
 	utils.h snap.c snap.h classic.c classic.h mount-support.c \
 	mount-support.h mount-support-nvidia.c mount-support-nvidia.h \
 	cleanup-funcs.c cleanup-funcs.h udev-support.c udev-support.h \
+	user-support.c user-support.h quirks.c quirks.h \
 	seccomp-support.c seccomp-support.h
 @SECCOMP_TRUE@am__objects_1 = snap_confine-seccomp-support.$(OBJEXT)
 am_snap_confine_OBJECTS = snap_confine-main.$(OBJEXT) \
@@ -122,7 +124,9 @@ am_snap_confine_OBJECTS = snap_confine-main.$(OBJEXT) \
 	snap_confine-mount-support.$(OBJEXT) \
 	snap_confine-mount-support-nvidia.$(OBJEXT) \
 	snap_confine-cleanup-funcs.$(OBJEXT) \
-	snap_confine-udev-support.$(OBJEXT) $(am__objects_1)
+	snap_confine-udev-support.$(OBJEXT) \
+	snap_confine-user-support.$(OBJEXT) \
+	snap_confine-quirks.$(OBJEXT) $(am__objects_1)
 snap_confine_OBJECTS = $(am_snap_confine_OBJECTS)
 am__DEPENDENCIES_1 =
 @SECCOMP_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
@@ -131,19 +135,22 @@ snap_confine_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3)
 snap_confine_LINK = $(CCLD) $(snap_confine_CFLAGS) $(CFLAGS) \
 	$(snap_confine_LDFLAGS) $(LDFLAGS) -o $@
-am_snap_confine_unit_tests_OBJECTS =  \
-	snap_confine_unit_tests-unit-tests-main.$(OBJEXT) \
-	snap_confine_unit_tests-unit-tests.$(OBJEXT) \
-	snap_confine_unit_tests-utils-test.$(OBJEXT) \
-	snap_confine_unit_tests-cleanup-funcs-test.$(OBJEXT) \
-	snap_confine_unit_tests-mount-support-test.$(OBJEXT) \
-	snap_confine_unit_tests-verify-executable-name-test.$(OBJEXT)
+am__snap_confine_unit_tests_SOURCES_DIST = unit-tests-main.c \
+	unit-tests.c unit-tests.h utils-test.c cleanup-funcs-test.c \
+	mount-support-test.c verify-executable-name-test.c
+@WITH_UNIT_TESTS_TRUE@am_snap_confine_unit_tests_OBJECTS = snap_confine_unit_tests-unit-tests-main.$(OBJEXT) \
+@WITH_UNIT_TESTS_TRUE@	snap_confine_unit_tests-unit-tests.$(OBJEXT) \
+@WITH_UNIT_TESTS_TRUE@	snap_confine_unit_tests-utils-test.$(OBJEXT) \
+@WITH_UNIT_TESTS_TRUE@	snap_confine_unit_tests-cleanup-funcs-test.$(OBJEXT) \
+@WITH_UNIT_TESTS_TRUE@	snap_confine_unit_tests-mount-support-test.$(OBJEXT) \
+@WITH_UNIT_TESTS_TRUE@	snap_confine_unit_tests-verify-executable-name-test.$(OBJEXT)
 snap_confine_unit_tests_OBJECTS =  \
 	$(am_snap_confine_unit_tests_OBJECTS)
 am__DEPENDENCIES_4 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_3)
-snap_confine_unit_tests_DEPENDENCIES = $(am__DEPENDENCIES_4) \
-	$(am__DEPENDENCIES_1)
+@WITH_UNIT_TESTS_TRUE@snap_confine_unit_tests_DEPENDENCIES =  \
+@WITH_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_4) \
+@WITH_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1)
 snap_confine_unit_tests_LINK = $(CCLD) \
 	$(snap_confine_unit_tests_CFLAGS) $(CFLAGS) \
 	$(snap_confine_unit_tests_LDFLAGS) $(LDFLAGS) -o $@
@@ -181,7 +188,7 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(snap_confine_SOURCES) $(snap_confine_unit_tests_SOURCES)
 DIST_SOURCES = $(am__snap_confine_SOURCES_DIST) \
-	$(snap_confine_unit_tests_SOURCES)
+	$(am__snap_confine_unit_tests_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -322,6 +329,7 @@ snap_confine_SOURCES = main.c sc-main.c sc-main.h utils.c utils.h \
 	snap.c snap.h classic.c classic.h mount-support.c \
 	mount-support.h mount-support-nvidia.c mount-support-nvidia.h \
 	cleanup-funcs.c cleanup-funcs.h udev-support.c udev-support.h \
+	user-support.c user-support.h quirks.c quirks.h \
 	$(am__append_1)
 
 # This is here to help fix rpmlint hardening issue.
@@ -330,19 +338,19 @@ snap_confine_CFLAGS = -Wall -Werror $(AM_CFLAGS) $(LIBUDEV_CFLAGS) \
 	$(SUID_CFLAGS) $(am__append_2) $(am__append_4)
 snap_confine_LDFLAGS = $(AM_LDFLAGS) $(SUID_LDFLAGS)
 snap_confine_LDADD = $(LIBUDEV_LIBS) $(am__append_3) $(am__append_5)
-snap_confine_unit_tests_SOURCES = \
-	unit-tests-main.c \
-	unit-tests.c \
-	unit-tests.h \
-	utils-test.c \
-	cleanup-funcs-test.c \
-	mount-support-test.c \
-	verify-executable-name-test.c
+@WITH_UNIT_TESTS_TRUE@snap_confine_unit_tests_SOURCES = \
+@WITH_UNIT_TESTS_TRUE@	unit-tests-main.c \
+@WITH_UNIT_TESTS_TRUE@	unit-tests.c \
+@WITH_UNIT_TESTS_TRUE@	unit-tests.h \
+@WITH_UNIT_TESTS_TRUE@	utils-test.c \
+@WITH_UNIT_TESTS_TRUE@	cleanup-funcs-test.c \
+@WITH_UNIT_TESTS_TRUE@	mount-support-test.c \
+@WITH_UNIT_TESTS_TRUE@	verify-executable-name-test.c
 
-snap_confine_unit_tests_CFLAGS = $(snap_confine_CFLAGS) $(GLIB_CFLAGS)
-snap_confine_unit_tests_LDADD = $(snap_confine_LDADD) $(GLIB_LIBS)
-snap_confine_unit_tests_LDFLAGS = $(snap_confine_LDFLAGS)
-EXTRA_DIST = 80-snappy-assign.rules snappy-app-dev
+@WITH_UNIT_TESTS_TRUE@snap_confine_unit_tests_CFLAGS = $(snap_confine_CFLAGS) $(GLIB_CFLAGS)
+@WITH_UNIT_TESTS_TRUE@snap_confine_unit_tests_LDADD = $(snap_confine_LDADD) $(GLIB_LIBS)
+@WITH_UNIT_TESTS_TRUE@snap_confine_unit_tests_LDFLAGS = $(snap_confine_LDFLAGS)
+EXTRA_DIST = 80-snappy-assign.rules snappy-app-dev snap-confine.apparmor.in
 all: all-am
 
 .SUFFIXES:
@@ -441,10 +449,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-mount-support-nvidia.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-mount-support.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-quirks.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-sc-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-seccomp-support.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-snap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-udev-support.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-user-support.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine-utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine_unit_tests-cleanup-funcs-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snap_confine_unit_tests-mount-support-test.Po@am__quote@
@@ -592,6 +602,34 @@ snap_confine-udev-support.obj: udev-support.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='udev-support.c' object='snap_confine-udev-support.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -c -o snap_confine-udev-support.obj `if test -f 'udev-support.c'; then $(CYGPATH_W) 'udev-support.c'; else $(CYGPATH_W) '$(srcdir)/udev-support.c'; fi`
+
+snap_confine-user-support.o: user-support.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -MT snap_confine-user-support.o -MD -MP -MF $(DEPDIR)/snap_confine-user-support.Tpo -c -o snap_confine-user-support.o `test -f 'user-support.c' || echo '$(srcdir)/'`user-support.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/snap_confine-user-support.Tpo $(DEPDIR)/snap_confine-user-support.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='user-support.c' object='snap_confine-user-support.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -c -o snap_confine-user-support.o `test -f 'user-support.c' || echo '$(srcdir)/'`user-support.c
+
+snap_confine-user-support.obj: user-support.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -MT snap_confine-user-support.obj -MD -MP -MF $(DEPDIR)/snap_confine-user-support.Tpo -c -o snap_confine-user-support.obj `if test -f 'user-support.c'; then $(CYGPATH_W) 'user-support.c'; else $(CYGPATH_W) '$(srcdir)/user-support.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/snap_confine-user-support.Tpo $(DEPDIR)/snap_confine-user-support.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='user-support.c' object='snap_confine-user-support.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -c -o snap_confine-user-support.obj `if test -f 'user-support.c'; then $(CYGPATH_W) 'user-support.c'; else $(CYGPATH_W) '$(srcdir)/user-support.c'; fi`
+
+snap_confine-quirks.o: quirks.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -MT snap_confine-quirks.o -MD -MP -MF $(DEPDIR)/snap_confine-quirks.Tpo -c -o snap_confine-quirks.o `test -f 'quirks.c' || echo '$(srcdir)/'`quirks.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/snap_confine-quirks.Tpo $(DEPDIR)/snap_confine-quirks.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='quirks.c' object='snap_confine-quirks.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -c -o snap_confine-quirks.o `test -f 'quirks.c' || echo '$(srcdir)/'`quirks.c
+
+snap_confine-quirks.obj: quirks.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -MT snap_confine-quirks.obj -MD -MP -MF $(DEPDIR)/snap_confine-quirks.Tpo -c -o snap_confine-quirks.obj `if test -f 'quirks.c'; then $(CYGPATH_W) 'quirks.c'; else $(CYGPATH_W) '$(srcdir)/quirks.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/snap_confine-quirks.Tpo $(DEPDIR)/snap_confine-quirks.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='quirks.c' object='snap_confine-quirks.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -c -o snap_confine-quirks.obj `if test -f 'quirks.c'; then $(CYGPATH_W) 'quirks.c'; else $(CYGPATH_W) '$(srcdir)/quirks.c'; fi`
 
 snap_confine-seccomp-support.o: seccomp-support.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(snap_confine_CFLAGS) $(CFLAGS) -MT snap_confine-seccomp-support.o -MD -MP -MF $(DEPDIR)/snap_confine-seccomp-support.Tpo -c -o snap_confine-seccomp-support.o `test -f 'seccomp-support.c' || echo '$(srcdir)/'`seccomp-support.c
@@ -915,7 +953,7 @@ check-syntax:
 
 .PHONY: check-unit-tests
 check-unit-tests: snap-confine-unit-tests
-	./snap-confine-unit-tests
+@WITH_UNIT_TESTS_TRUE@	./snap-confine-unit-tests
 
 # Run check-syntax when checking
 # TODO: conver those to autotools-style tests later
@@ -923,18 +961,29 @@ check: check-syntax check-unit-tests
 
 .PHONY: fmt
 fmt:
-	for f in $(wildcard *.c) $(wildcard *.h); do \
+	for f in $(wildcard $(srcdir)/*.c) $(wildcard $(srcdir)/*.h); do \
 	       echo "Formatting $$f ... "; \
 	       indent -linux "$$f"; \
 	done;
 
+snap-confine.apparmor: snap-confine.apparmor.in Makefile
+	sed -e 's,[@]LIBEXECDIR[@],$(libexecdir),g' <$< >$@
+
 # NOTE: This makes distcheck fail but it is required for udev, so go figure.
 # http://www.gnu.org/software/automake/manual/automake.html#Hard_002dCoded-Install-Paths
 #
-# Install udev rules
-install-data-local:
+# Install udev rules and the apparmor profile
+#
+# NOTE: the funky make functions here just convert /foo/bar/froz into foo.bar.froz
+# The inner subst replaces slashes with dots and the outer patsubst strips the leading dot
+#
+# NOTE: The 'void' directory *has to* be chmod 000
+install-data-local: snap-confine.apparmor
 	install -d -m 755 $(DESTDIR)$(shell pkg-config udev --variable=udevdir)/rules.d
 	install -m 644 $(srcdir)/80-snappy-assign.rules $(DESTDIR)$(shell pkg-config udev --variable=udevdir)/rules.d
+	install -d -m 755 $(DESTDIR)/etc/apparmor.d/
+	install -m 644 snap-confine.apparmor $(DESTDIR)/etc/apparmor.d/$(patsubst .%,%,$(subst /,.,$(libexecdir))).snap-confine
+	install -d -m 000 $(DESTDIR)/var/lib/snapd/void
 
 # Install support script for udev rules
 install-exec-local:

@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH SNAP-CONFINE 5 "2016-07-15" "1.0.39" "snappy"
+.TH SNAP-CONFINE 5 "2016-08-22" "1.0.40" "snappy"
 .SH NAME
 snap-confine \- internal tool for confining snappy applications
 .
@@ -79,6 +79,18 @@ By default all mount entries start with the following flags: \fIbind\fP, \fIro\f
 option (e.g. \fIrw\fP can cause the mount point to be writable).
 .sp
 As a security precaution only \fIbind\fP mounts are supported at this time.
+.SS Quirks
+.sp
+\fIsnap\-confine\fP contains a quirk system that emulates some or the behavior of
+the older versions of snap\-confine that certain snaps (still in devmode but
+useful and important) have grown to rely on. This section documents the list of
+quirks:
+.INDENT 0.0
+.IP \(bu 2
+The /var/lib/lxd directory, if it exists on the host, is made available in
+the execution environment. This allows various snaps, while running in
+devmode, to access the LXD socket. LP: #1613845
+.UNINDENT
 .SH ENVIRONMENT
 .sp
 \fIsnap\-confine\fP responds to the following environment variables
@@ -101,6 +113,13 @@ Internal variable that should not be relied upon.
 .TP
 .B \fISNAPPY_LAUNCHER_SECCOMP_PROFILE_DIR\fP:
 Internal variable that should not be relied upon.
+.TP
+.B \fISNAP_USER_DATA\fP:
+Full path to the directory like /home/$LOGNAME/snap/$SNAP_NAME/$SNAP_REVISION.
+.sp
+This directory is created by snap\-confine on startup. This is a temporary
+feature that will be merged into snapd\(aqs snap\-run command. The set of directories
+that can be created is confined with apparmor.
 .UNINDENT
 .SH FILES
 .sp

@@ -158,7 +158,7 @@ CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in COPYING \
-	compile config.guess config.sub depcomp install-sh missing
+	compile config.guess config.sub install-sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -312,7 +312,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = src tests docs
-EXTRA_DIST = PORTING README.md
+EXTRA_DIST = PORTING README.md VERSION
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -784,6 +784,13 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
+
+.PHONY: check
+check: check-syntax
+
+.PHONY: check-syntax
+check-syntax:
+	shellcheck --format=gcc .spread-prepare.sh
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
