@@ -1,4 +1,4 @@
-snap-confine (1.0.40-1) UNRELEASED; urgency=medium
+snap-confine (1.0.40-0ubuntu1) yakkety; urgency=medium
 
   * New upstream release, full list of issues is available at
     https://launchpad.net/snap-confine/+milestone/1.0.40
