@@ -15,15 +15,10 @@
  *
  */
 
-#ifndef SNAP_CONFINE_MAIN
-#define SNAP_CONFINE_MAIN
+#ifndef SNAP_CONFINE_USER_SUPPORT_H
+#define SNAP_CONFINE_USER_SUPPORT_H
 
-/*! The void directory.
- *  Snap confine moves to that directory in case it cannot retain
- *  the current working directory across the pivot_root call.
- **/
-#define SC_VOID_DIR "/var/lib/snapd/void"
+void setup_user_data();
+void mkpath(const char *const path);
 
-int sc_main(int argc, char **argv);
-
-#endif				// SNAP_CONFINE_MAIN
+#endif

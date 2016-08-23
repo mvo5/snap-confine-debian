@@ -78,6 +78,9 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
+/* Support for merged /usr directory */
+#undef MERGED_USR
+
 /* Support for propietary nvidia drivers (Arch) */
 #undef NVIDIA_ARCH
 

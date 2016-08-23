@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Canonical Ltd
+ * Copyright (C) 2016 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -15,15 +15,16 @@
  *
  */
 
-#ifndef SNAP_CONFINE_MAIN
-#define SNAP_CONFINE_MAIN
+#ifndef SNAP_QUIRKS_H
+#define SNAP_QUIRKS_H
 
-/*! The void directory.
- *  Snap confine moves to that directory in case it cannot retain
- *  the current working directory across the pivot_root call.
+/**
+ * Setup various quirks that have to exists for now.
+ *
+ * This function applies non-standard tweaks that are required
+ * because of requirement to stay compatible with certain snaps
+ * that were tested with pre-chroot layout.
  **/
-#define SC_VOID_DIR "/var/lib/snapd/void"
+void sc_setup_quirks();
 
-int sc_main(int argc, char **argv);
-
-#endif				// SNAP_CONFINE_MAIN
+#endif

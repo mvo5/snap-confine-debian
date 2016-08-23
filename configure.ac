@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([snap-confine], [1.0.39], [snapcraft@lists.ubuntu.com])
+AC_INIT([snap-confine], m4_esyscmd_s([cat VERSION]), [snapcraft@lists.ubuntu.com])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
 AC_USE_SYSTEM_EXTENSIONS
@@ -32,6 +32,15 @@ AC_FUNC_FORK
 AC_FUNC_STRNLEN
 AC_CHECK_FUNCS([mkdir regcomp setenv strdup strerror])
 
+AC_ARG_WITH([unit-tests],
+    AC_HELP_STRING([--without-unit-tests], [do not build unit test programs]),
+    [case "${withval}" in
+        yes) with_unit_tests=yes ;;
+        no)  with_unit_tests=no ;;
+        *)   AC_MSG_ERROR([bad value ${withval} for --without-unit-tests])
+    esac], [with_unit_tests=yes])
+AM_CONDITIONAL([WITH_UNIT_TESTS], [test "x$with_unit_tests" = "xyes"])
+
 # Allow to build without apparmor support by calling:
 # ./configure --disable-apparmor
 # This makes it possible to run snaps in devmode on almost any host,
@@ -62,6 +71,11 @@ AM_CONDITIONAL([SECCOMP], [test "x$enable_seccomp" = "xyes"])
 # The tests are of smaller value as we port more and more tests to spread.
 AM_CONDITIONAL([CONFINEMENT_TESTS], [test "x$enable_apparmor" = "xyes" && test "x$enable_seccomp" = "xyes" && ((test "x$host_cpu" = "xx86_64" && test "x$build_cpu" = "xx86_64") || (test "x$host_cpu" = "xi686" && test "x$build_cpu" = "xi686"))])
 
+# Check for glib that we use for unit testing
+AS_IF([test "x$with_unit_tests" = "xyes"], [
+    PKG_CHECK_MODULES([GLIB], [glib-2.0])
+])
+
 # Check if seccomp userspace library is available
 AS_IF([test "x$enable_seccomp" = "xyes"], [
     PKG_CHECK_MODULES([SECCOMP], [libseccomp], [
@@ -85,8 +99,6 @@ AS_IF([test "x$enable_apparmor" = "xyes"], [
 # Those are now used unconditionally even if apparmor is disabled.
 PKG_CHECK_MODULES([LIBUDEV], [libudev])
 PKG_CHECK_MODULES([UDEV], [udev])
-# Check for glib that we use for unit testing
-PKG_CHECK_MODULES([GLIB], [glib-2.0])
 
 # Enable special support for hosts with proprietary nvidia drivers on Ubuntu.
 AC_ARG_ENABLE([nvidia-ubuntu],
@@ -115,6 +127,19 @@ AM_CONDITIONAL([NVIDIA_ARCH], [test "x$enable_nvidia_arch" = "xyes"])
 AS_IF([test "x$enable_nvidia_arch" = "xyes"], [
     AC_DEFINE([NVIDIA_ARCH], [1],
         [Support for propietary nvidia drivers (Arch)])])
+
+AC_ARG_ENABLE([merged-usr],
+    AS_HELP_STRING([--enable-merged-usr], [Enable support for merged /usr directory]),
+    [case "${enableval}" in
+        yes) enable_merged_usr=yes ;;
+        no)  enable_merged_usr=no ;;
+        *) AC_MSG_ERROR([bad value ${enableval} for --enable-merged-usr])
+    esac], [enable_merged_usr=no])
+AM_CONDITIONAL([MERGED_USR], [test "x$enable_merged_usr" = "xyes"])
+
+AS_IF([test "x$enable_merged_usr" = "xyes"], [
+    AC_DEFINE([MERGED_USR], [1],
+        [Support for merged /usr directory])])
 
 AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile docs/Makefile])
 AC_OUTPUT
