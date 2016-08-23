@@ -9,6 +9,7 @@ snap-confine (1.0.40-1) UNRELEASED; urgency=medium
   * Add directory /var/lib/snapd/void to snap-confine
   * Add patch: 0001-Don-t-shellcheck-files-spread-prepare-script.patch that
     fixes make check due to a mistake upstream.
+  * Add patch: 0001-Stop-using-deprecated-readdir_r.patch (LP: #1615615)
 
  -- Zygmunt Krynicki <zygmunt.krynicki@canonical.com>  Tue, 23 Aug 2016 10:53:16 +0200
 

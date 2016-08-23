@@ -1,1 +1,2 @@
 0001-Don-t-shellcheck-files-spread-prepare-script.patch
+0001-Stop-using-deprecated-readdir_r.patch

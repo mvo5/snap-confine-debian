@@ -1,0 +1,48 @@
+From 79ef91be554c29a74225aa1b58a641f48ca88bff Mon Sep 17 00:00:00 2001
+From: Zygmunt Krynicki <zygmunt.krynicki@canonical.com>
+Date: Tue, 23 Aug 2016 12:12:18 +0200
+Subject: [PATCH] Stop using deprecated readdir_r
+
+This patch replaces the use of readdir_r with plain readdir. For more
+background information please see the bug report.
+
+Fixes: https://bugs.launchpad.net/snap-confine/+bug/1615615
+Signed-off-by: Zygmunt Krynicki <zygmunt.krynicki@canonical.com>
+---
+ src/quirks.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/quirks.c b/src/quirks.c
+index 39bb8e6..db5231c 100644
+--- a/src/quirks.c
++++ b/src/quirks.c
+@@ -23,6 +23,7 @@
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <unistd.h>
++#include <errno.h>
+ 
+ #include "utils.h"
+ #include "cleanup-funcs.h"
+@@ -89,11 +90,16 @@ static void sc_quirk_create_writable_mimic(const char *mimic_dir,
+ 	if (dirp == NULL) {
+ 		die("cannot open reference directory %s", ref_dir);
+ 	}
+-	struct dirent entry, *entryp = NULL;
++	struct dirent *entryp = NULL;
+ 	do {
+ 		char src_name[PATH_MAX * 2];
+ 		char dest_name[PATH_MAX * 2];
+-		if (readdir_r(dirp, &entry, &entryp) != 0) {
++		// Set errno to zero, if readdir fails it will not only return null but
++		// set errno to a non-zero value. This is how we can differentiate
++		// end-of-directory from an actual error.
++		errno = 0;
++		entryp = readdir(dirp);
++		if (entryp == NULL && errno != 0) {
+ 			die("cannot read another directory entry");
+ 		}
+ 		if (entryp == NULL) {
+-- 
+2.7.4
+
