@@ -1,0 +1,30 @@
+From: Zygmunt Krynicki <zygmunt.krynicki@canonical.com>
+Date: Tue, 23 Aug 2016 11:05:56 +0200
+Subject: Don't shellcheck files spread prepare script
+
+This patch changes make check in the top-level directory not to run the
+syntax-check target which was testing the spread prepare script.  Spread
+data is not part of the upstream release.
+
+This was also fixed upstream with two commits, it can be safely dropped
+with the next release (1.0.41)
+
+Signed-off-by: Zygmunt Krynicki <zygmunt.krynicki@canonical.com>
+---
+ Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f319a7a..33df663 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,9 +1,6 @@
+ SUBDIRS = src tests docs
+ EXTRA_DIST = PORTING README.md VERSION
+ 
+-.PHONY: check
+-check: check-syntax
+-
+ .PHONY: check-syntax
+ check-syntax:
+ 	shellcheck --format=gcc .spread-prepare.sh

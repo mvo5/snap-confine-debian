@@ -7,6 +7,8 @@ snap-confine (1.0.40-1) UNRELEASED; urgency=medium
     configuration prefix.
   * Drop patch: prctl-compatibility.patch(applied upstream)
   * Add directory /var/lib/snapd/void to snap-confine
+  * Add patch: 0001-Don-t-shellcheck-files-spread-prepare-script.patch that
+    fixes make check due to a mistake upstream.
 
  -- Zygmunt Krynicki <zygmunt.krynicki@canonical.com>  Tue, 23 Aug 2016 10:53:16 +0200
 
